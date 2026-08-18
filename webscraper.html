@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Scraper | EoNs Automation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bbb;
+            font-weight: 600;
+        }
+        textarea {
+            width: 100%;
+            height: 180px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #1e1e1e;
+            color: white;
+            font-size: 14px;
+            box-sizing: border-box;
+            margin-bottom: 14px;
+            resize: vertical;
+        }
+        button {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #1565c0;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px 5px 10px 0;
+        }
+        button:hover {
+            background: #0d47a1;
+        }
+        .secondary {
+            background: #333;
+        }
+        .secondary:hover {
+            background: #444;
+        }
+        .result-box {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 18px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+        }
+        .note {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 13px;
+            color: #aaa;
+            margin-bottom: 14px;
+        }
+        .warning {
+            background: #2a1a1a;
+            border: 1px solid #c62828;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 13px;
+            color: #ef9a9a;
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+        .warning strong {
+            color: #ffcdd2;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Web Scraper</h1>
+    <p class="subtitle">EoNs Automation</p>
+
+    <div class="warning">
+        <strong>Important – Please Read</strong><br><br>
+        This tool is intended only for extracting information from publicly available web pages that you have permission to access.<br><br>
+        • Do not use this tool to scrape private data, personal information, or content behind logins.<br>
+        • Always respect a website’s Terms of Service and robots.txt rules.<br>
+        • You are responsible for how you use any data extracted with this tool.<br>
+        • This project is provided for educational and legitimate productivity purposes only.
+    </div>
+
+    <div class="note">
+        Paste the HTML of a public webpage below.<br>
+        You can get this by visiting a page → right-click → View Page Source → copy the content.<br>
+        The full URL-based scraper is available in the Python version of this project.
+    </div>
+
+    <label for="htmlInput">Paste Page HTML</label>
+    <textarea id="htmlInput" placeholder="Paste HTML here..."></textarea>
+
+    <button onclick="extractText()">Extract Text</button>
+    <button onclick="extractLinks()">Extract Links</button>
+    <button onclick="extractHeadings()">Extract Headings</button>
+    <button onclick="extractImages()">Extract Images</button>
+    <button class="secondary" onclick="downloadResult()">Download Result</button>
+
+    <div class="result-box" id="result"></div>
+
+    <script>
+        let lastResult = "";
+
+        function getDoc() {
+            const html = document.getElementById("htmlInput").value;
+            if (!html.trim()) {
+                alert("Please paste some HTML first.");
+                return null;
+            }
+            return new DOMParser().parseFromString(html, "text/html");
+        }
+
+        function showResult(text) {
+            lastResult = text;
+            const box = document.getElementById("result");
+            box.style.display = "block";
+            box.textContent = text;
+        }
+
+        function extractText() {
+            const doc = getDoc();
+            if (!doc) return;
+            const text = doc.body.innerText || doc.body.textContent || "";
+            showResult(text.trim());
+        }
+
+        function extractLinks() {
+            const doc = getDoc();
+            if (!doc) return;
+            const links = [...doc.querySelectorAll("a[href]")];
+            if (links.length === 0) {
+                showResult("No links found.");
+                return;
+            }
+            let output = "Link Text,URL\n";
+            links.forEach(a => {
+                const text = a.textContent.trim().replace(/,/g, " ");
+                const href = a.getAttribute("href");
+                output += `"${text}","${href}"\n`;
+            });
+            showResult(output);
+        }
+
+        function extractHeadings() {
+            const doc = getDoc();
+            if (!doc) return;
+            const headings = [...doc.querySelectorAll("h1, h2, h3")];
+            if (headings.length === 0) {
+                showResult("No headings found.");
+                return;
+            }
+            let output = "Type,Text\n";
+            headings.forEach(h => {
+                const text = h.textContent.trim().replace(/,/g, " ");
+                output += `${h.tagName},"${text}"\n`;
+            });
+            showResult(output);
+        }
+
+        function extractImages() {
+            const doc = getDoc();
+            if (!doc) return;
+            const images = [...doc.querySelectorAll("img")];
+            if (images.length === 0) {
+                showResult("No images found.");
+                return;
+            }
+            let output = "Alt Text,Image URL\n";
+            images.forEach(img => {
+                const alt = (img.getAttribute("alt") || "").replace(/,/g, " ");
+                const src = img.getAttribute("src") || "";
+                output += `"${alt}","${src}"\n`;
+            });
+            showResult(output);
+        }
+
+        function downloadResult() {
+            if (!lastResult) {
+                alert("Extract something first.");
+                return;
+            }
+            const blob = new Blob([lastResult], { type: "text/plain" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "scraped_result.txt";
+            link.click();
+        }
+    </script>
+
+</body>
+</html>

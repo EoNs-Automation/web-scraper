@@ -36,3 +36,8 @@ This tool is intended only for extracting information from publicly available pa
 ## About
 
 This project is part of **EoNs Automation**.
+
+## License
+
+This project is released under the MIT License.  
+For commercial use or custom versions, contact EoNs Automation.

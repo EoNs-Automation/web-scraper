@@ -17,6 +17,9 @@ A simple tool for extracting text, links, headings, and images from publicly ava
 
 [Try the web version here](https://web-scraper-4c7636.netlify.app/)
 
+Also in the EoNs Tools Hub:
+https://tool-hub-f5b755.netlify.app/
+
 ## Important Notice
 
 This tool is intended only for extracting information from publicly available pages that you have permission to access. Always respect website Terms of Service and robots.txt rules. You are responsible for how you use any data extracted with this tool.
